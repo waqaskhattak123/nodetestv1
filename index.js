@@ -13,8 +13,20 @@ app.use(express.urlencoded({ extended: true }));
 const todoRoutes = require("./routes/todoRoutes");
 app.use("/api/todos", todoRoutes);
 
+// Log environment variables (without sensitive data)
+console.log("Environment variables loaded:", {
+  port: PORT,
+  mongodb_uri_exists: !!process.env.MONGODB_URI
+});
+
 // Connect to MongoDB
-mongoose.connect(process.env.mongodbUrl)
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+  console.error("MONGODB_URI environment variable is not defined");
+  process.exit(1);
+}
+
+mongoose.connect(MONGODB_URI)
   .then(() => {
     console.log("Connected to MongoDB");
     app.listen(PORT, () => {
